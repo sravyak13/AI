@@ -148,4 +148,4 @@ if solution is None:
 else:
     for step in solution:
         print(step)
-    print(f"Solution found in {moves} moves")
+    print(f"Solution found in {moves} moves") 
