@@ -26,7 +26,6 @@ target4 = [
     ['orange_1', 'orange_2', 'orange_3', 'orange_4']
 ]
 
-# Define the start and target arrays
 start = [
     ['banana_3', 'orange_2', 'banana_9', 'apple_6', 'apple_1', 'apple_7', 'orange_1', 'banana_4', 'apple_8'],
     ['apple_5', 'banana_6', 'orange_5', 'banana_1', 'orange_7', 'orange_8', 'apple_9', 'apple_4', 'banana_5'],
@@ -40,7 +39,6 @@ target = [
 ]
 
 
-# Define a class to represent the state
 class State:
     def __init__(self, array: List[List[str]]):
         self.array = array
@@ -115,11 +113,11 @@ def astar(start: List[List[str]], target: List[List[str]]) -> Tuple[List[List[st
     frontier = [start_state]
     visited = set()
     
-    while frontier:
-        current_state = heappop(frontier)
+    while frontier: #continues until frontier is empty goal is found 
+        current_state = heappop(frontier) # pops the state with the lowest f value
         visited.add(current_state)
         
-        if current_state.array == target:
+        if current_state.array == target: 
             moves = current_state.g
             path = []
             while current_state:
@@ -128,12 +126,12 @@ def astar(start: List[List[str]], target: List[List[str]]) -> Tuple[List[List[st
             path.reverse()
             return (path, moves)
         
-        for successor in current_state.get_successors(target):
-            if successor in visited:
+        for successor in current_state.get_successors(target): #successors are added to frontier
+            if successor in visited: #
                 continue
             if successor not in frontier:
                 heappush(frontier, successor)
-            else:
+            else: #if successor is already in frontier, check if cost is lower
                 index = frontier.index(successor)
                 if frontier[index].f > successor.f:
                     frontier[index] = successor
@@ -148,7 +146,6 @@ solution, moves = astar(start, target)
 if solution is None:
     print("No solution found.")
 else:
-    print(f"Solution found in {moves} moves:")
     for step in solution:
         print(step)
-
+    print(f"Solution found in {moves} moves")
