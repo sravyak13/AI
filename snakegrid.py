@@ -99,4 +99,4 @@ if snake(grid, available, domain):
     for row in grid:
         print(" ".join(row))
 else:
-    print("No solution available")
+    print("No solution available") 
