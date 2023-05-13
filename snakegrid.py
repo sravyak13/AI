@@ -1,11 +1,5 @@
 
-grid = [['-', '-', '-', '-', 'Y'],
-        ['R', 'A', '-', '-', '-'],
-        ['-', '-', '-', '-', '-'],
-        ['-', 'E', '-', '-', '-'],
-        ['-', '-', '-', '-', 'K']]
-
-#function checks whether a given letter can be placed in a given cell of the grid, 
+#function checks whether a letter can be placed in a cell of the grid, 
 # by checking whether the letter is adjacent to any existing letters in the grid 
 def validCheck(letter, row, column, grid):
     adjacent_cells = []
@@ -66,8 +60,8 @@ def snake(grid, available, domain, row=0, column=0): # recursive backtracking fu
 
     return False     # If no letter in the domain works, backtrack
 
-
-def getAvailableLetters(grid): # returns the set of available letters
+#returns the set of available letters that can be assigned to empty cells in the grid
+def getAvailableLetters(grid):
     unavailable = set()
     for row in grid:
         for cell in row:
@@ -76,7 +70,23 @@ def getAvailableLetters(grid): # returns the set of available letters
     available = set(chr(ord('A') + i) for i in range(25)) - unavailable
     return available
 
-def getCellDomain(grid): # returns the domain of each cell
+# to initialize the domain using AC3 algorithm by updating the domain of each variable 
+# by removing values that are inconsistent with the constraints of the problem
+def ac3(domain):
+    queue = list(domain.keys()) # initialize queue with all variables
+    while queue:
+        variable = queue.pop(0)
+        for neighbor in getNeighbors(variable):
+            if revise(domain, variable, neighbor):
+                if not domain[variable]:
+                    return False
+                for neighbor2 in getNeighbors(variable):
+                    if neighbor2 != neighbor:
+                        queue.append(neighbor2)
+    return True
+
+#returns the domain of each empty cell in the grid
+def getCellDomain(grid):
     domain = {}
     for row in range(5):
         for column in range(5):
@@ -89,9 +99,36 @@ def getCellDomain(grid): # returns the domain of each cell
                 if len(available_values) == 0:
                     return {}
                 domain[(row, column)] = available_values
+    if not ac3(domain):
+        return {}
     return domain
 
+#returns the neighbors of a given variable
+def getNeighbors(variable):
+    neighbors = []
+    row, column = variable
+    for row_inc, column_inc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        row_temp, column_temp = row + row_inc, column + column_inc
+        if 0 <= row_temp < 5 and 0 <= column_temp < 5 and grid[row_temp][column_temp] == '-':
+            neighbors.append((row_temp, column_temp))
+    return neighbors
 
+#removes values from the domain of variable1 that are inconsistent with the domain of variable2
+#returns True if any values are removed, and False otherwise
+def revise(domain, variable1, variable2):
+    revised = False
+    for value in domain[variable1]:
+        if not any(value2 != value for value2 in domain[variable2]):
+            domain[variable1].remove(value)
+            revised = True
+    return revised
+
+
+grid = [['-', '-', '-', '-', 'Y'],
+        ['R', 'A', '-', '-', '-'],
+        ['-', '-', '-', '-', '-'],
+        ['-', 'E', '-', '-', '-'],
+        ['-', '-', '-', '-', 'K']]
 
 domain = getCellDomain(grid)
 available = getAvailableLetters(grid)
@@ -99,4 +136,4 @@ if snake(grid, available, domain):
     for row in grid:
         print(" ".join(row))
 else:
-    print("No solution available") 
+    print("No solution found")
